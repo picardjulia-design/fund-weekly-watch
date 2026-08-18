@@ -713,11 +713,7 @@ render_html(
             Suivi des performances, actualités et commentaires de gestion
             des principales valeurs du portefeuille.
         </div>
-        <div class="hero-meta">
-            <span>Marchés : <b>Yahoo Finance</b></span>
-            <span>Synthèse : <b>Mistral AI</b></span>
-            <span>Sources : <b>sélectionnées manuellement</b></span>
-        </div>
+        
     </div>
     """
 )
