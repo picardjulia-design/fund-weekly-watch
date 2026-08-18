@@ -264,3 +264,165 @@ if MISTRAL_API_KEY:
     st.success("Clé Mistral détectée")
 else:
     st.warning("Aucune clé Mistral détectée")
+st.divider()
+st.subheader("Génération du commentaire")
+
+if uploaded_file is not None:
+
+    available_tickers = weekly_news["ticker"].dropna().unique().tolist()
+
+    selected_ticker = st.selectbox(
+        "Valeur à analyser",
+        available_tickers
+    )
+
+    if st.button("Générer le commentaire"):
+
+        # Informations de la valeur
+        company_config = config[
+            config["ticker"] == selected_ticker
+        ]
+
+        if company_config.empty:
+            st.error("Cette valeur n'existe pas dans config.csv.")
+            st.stop()
+
+        company_name = company_config.iloc[0]["name"]
+        weight = company_config.iloc[0]["weight"]
+
+        # Articles associés à cette valeur
+        company_news = weekly_news[
+            weekly_news["ticker"] == selected_ticker
+        ]
+
+        article_contents = []
+
+        for _, article in company_news.iterrows():
+
+            text = extract_article_text(article["url"])
+
+            if text:
+                article_contents.append(
+                    f"""
+TITRE : {article['title']}
+
+CONTENU :
+{text}
+"""
+                )
+
+        if not article_contents:
+            st.error(
+                "Aucun des articles de cette valeur n'a pu être lu."
+            )
+            st.stop()
+
+        # Récupération des cours spécifiquement pour cette valeur
+        yf_ticker = company_config.iloc[0]["yfinance_ticker"]
+
+        data = yf.download(
+            yf_ticker,
+            start=monday - timedelta(days=7),
+            end=friday + timedelta(days=3),
+            progress=False,
+            auto_adjust=False
+        )
+
+        closes = data["Close"].dropna()
+
+        if hasattr(closes, "columns"):
+            closes = closes.iloc[:, 0]
+
+        closes = closes[closes.index.date <= friday]
+
+        week_closes = closes[
+            (closes.index.date >= monday) &
+            (closes.index.date <= friday)
+        ]
+
+        if week_closes.empty:
+            st.error("Impossible de récupérer les cours.")
+            st.stop()
+
+        price_text = []
+
+        for dt, close in week_closes.items():
+
+            position = closes.index.get_loc(dt)
+
+            if position > 0:
+                previous_close = closes.iloc[position - 1]
+                variation = (close / previous_close - 1) * 100
+            else:
+                variation = None
+
+            price_text.append(
+                f"{dt.strftime('%A %d/%m/%Y')} : "
+                f"{float(close):.2f} "
+                f"({variation:+.2f} %)"
+                if variation is not None
+                else f"{dt.strftime('%A %d/%m/%Y')} : {float(close):.2f}"
+            )
+
+        first_position = closes.index.get_loc(week_closes.index[0])
+
+        if first_position > 0:
+            previous_close = closes.iloc[first_position - 1]
+            weekly_perf = (
+                week_closes.iloc[-1] / previous_close - 1
+            ) * 100
+        else:
+            weekly_perf = 0
+
+        prompt = f"""
+Tu es analyste au sein d'une société de gestion d'actifs.
+
+Tu dois rédiger le commentaire hebdomadaire d'une valeur détenue
+dans un fonds thématique.
+
+VALEUR
+{company_name} ({selected_ticker})
+
+POIDS DANS LE FONDS
+{weight} %
+
+COURS DE LA SEMAINE
+{chr(10).join(price_text)}
+
+PERFORMANCE HEBDOMADAIRE
+{weekly_perf:+.2f} %
+
+INFORMATIONS DISPONIBLES
+{chr(10).join(article_contents)}
+
+Rédige UN SEUL paragraphe en français de 4 à 6 phrases.
+
+Contraintes impératives :
+
+- Commence directement par le fait marquant de la semaine.
+- Utilise les chiffres précis présents dans les informations fournies
+  lorsqu'ils sont pertinents.
+- Explique explicitement comment ces événements peuvent avoir contribué
+  au mouvement du cours observé pendant la semaine.
+- Si le comportement du titre paraît contradictoire avec les nouvelles,
+  signale-le explicitement.
+- Termine par une phrase indiquant l'implication pour la position dans
+  le fonds : risque, catalyseur à venir ou point de vigilance.
+- Adopte un ton factuel, concis et professionnel de note de gestion.
+- Ne mentionne jamais "l'article", "les articles", "la presse",
+  "la source" ou "selon".
+- N'invente aucun chiffre ni aucune information.
+- Si une information n'est pas disponible, ne la suppose pas.
+"""
+
+        with st.spinner("Génération du commentaire..."):
+            comment = call_mistral(
+                prompt,
+                MISTRAL_API_KEY
+            )
+
+        st.text_area(
+            "Commentaire généré",
+            value=comment,
+            height=220
+        )
