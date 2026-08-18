@@ -98,7 +98,112 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
+st.markdown("""
+<style>
 
+/* Fond général */
+.stApp {
+    background-color: #F7F9FC;
+    color: #0B1F33;
+}
+
+/* Largeur et respiration */
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+    max-width: 1450px;
+}
+
+/* Titres */
+h1, h2, h3 {
+    color: #102A43;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    font-size: 2.6rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.3rem !important;
+}
+
+h2 {
+    font-size: 1.7rem !important;
+    font-weight: 650 !important;
+    margin-top: 2rem !important;
+}
+
+h3 {
+    font-size: 1.25rem !important;
+}
+
+/* Texte courant */
+p, label, .stMarkdown {
+    color: #334E68;
+}
+
+/* Boutons */
+.stButton > button {
+    background-color: #123B5D;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.55rem 1.2rem;
+    font-weight: 600;
+}
+
+.stButton > button:hover {
+    background-color: #00A6A6;
+    color: white;
+    border: none;
+}
+
+/* Upload */
+[data-testid="stFileUploader"] {
+    background-color: white;
+    border: 1px solid #D9E2EC;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+/* Inputs */
+[data-baseweb="select"] > div,
+[data-testid="stDateInput"] input,
+textarea {
+    background-color: white !important;
+    border-color: #BCCCDC !important;
+}
+
+/* Tableaux */
+[data-testid="stDataFrame"] {
+    background-color: white;
+    border: 1px solid #D9E2EC;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Séparateurs */
+hr {
+    border: none;
+    border-top: 1px solid #D9E2EC;
+    margin: 2.5rem 0;
+}
+
+/* Messages succès */
+[data-testid="stAlert"] {
+    border-radius: 6px;
+}
+
+/* Sidebar éventuelle */
+section[data-testid="stSidebar"] {
+    background-color: #102A43;
+}
+
+section[data-testid="stSidebar"] * {
+    color: white;
+}
+
+</style>
+""", unsafe_allow_html=True)
 st.title("Fund Weekly Watch")
 st.write("Veille hebdomadaire des valeurs du fonds")
 
