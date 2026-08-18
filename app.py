@@ -744,7 +744,11 @@ weekly_news = None
 
 if uploaded_file is not None:
     try:
-        weekly_news = pd.read_csv(uploaded_file, sep=";")
+        try:
+    weekly_news = pd.read_csv(uploaded_file, sep=";", encoding="utf-8")
+except UnicodeDecodeError:
+    uploaded_file.seek(0)
+    weekly_news = pd.read_csv(uploaded_file, sep=";", encoding="cp1252")
         required = {"ticker", "title", "url"}
 
         if not required.issubset(weekly_news.columns):
