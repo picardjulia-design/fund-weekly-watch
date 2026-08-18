@@ -699,7 +699,7 @@ render_html(
     f"""
     <div class="cpr-top">
         <div class="cpr-logo-box">{logo_html}</div>
-        <div class="internal-badge">Document de travail interne</div>
+        
     </div>
     """
 )
