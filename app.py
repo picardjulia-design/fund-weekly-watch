@@ -21,220 +21,212 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* =========================================================
+/* =========================
    PAGE
-   ========================================================= */
+   ========================= */
 
 .stApp {
-    background: #FFFFFF;
+    background-color: #FFFFFF;
 }
 
 .block-container {
-    max-width: 1380px;
-    padding-top: 3rem;
+    max-width: 1450px;
+    padding-top: 2.5rem;
     padding-bottom: 5rem;
-    padding-left: 3.5rem;
-    padding-right: 3.5rem;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
 }
 
 
-/* =========================================================
-   TYPOGRAPHIE
-   ========================================================= */
+/* =========================
+   TYPO
+   ========================= */
 
-html, body, [class*="css"] {
-    font-family: Arial, Helvetica, sans-serif;
+h1, h2, h3 {
+    color: #113653 !important;
 }
 
 h1 {
-    color: #0F2D4A;
-    font-size: 3rem !important;
-    line-height: 1.08 !important;
+    font-size: 2.8rem !important;
     font-weight: 500 !important;
-    letter-spacing: -0.035em !important;
-    margin-bottom: 0.6rem !important;
+    letter-spacing: -0.03em !important;
 }
 
 h2 {
-    color: #0F2D4A;
-    font-size: 1.65rem !important;
-    line-height: 1.2 !important;
-    font-weight: 500 !important;
-    letter-spacing: -0.015em;
-    margin-top: 2.8rem !important;
-    margin-bottom: 1.2rem !important;
+    font-size: 1.55rem !important;
+    font-weight: 600 !important;
 }
 
 h3 {
-    color: #0F2D4A;
     font-size: 1.15rem !important;
     font-weight: 600 !important;
 }
 
-p {
-    color: #34393D;
-    line-height: 1.55;
-}
-
-[data-testid="stCaptionContainer"] {
-    color: #6F757B;
-    font-size: 0.95rem;
+p, label, span {
+    color: #2C3034;
 }
 
 
-/* =========================================================
-   SEPARATEURS
-   ========================================================= */
-
-hr {
-    border: 0;
-    border-top: 1px solid #DADDE0;
-    margin-top: 2.8rem;
-    margin-bottom: 2.8rem;
-}
-
-
-/* =========================================================
+/* =========================
    BOUTONS
-   ========================================================= */
+   ========================= */
 
 .stButton > button {
-    background-color: #0F2D4A;
-    color: #FFFFFF;
-    border: 1px solid #0F2D4A;
-    border-radius: 0px;
-    min-height: 42px;
-    padding: 0.55rem 1.3rem;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: all 0.15s ease;
+    background-color: #113653 !important;
+    border: 1px solid #113653 !important;
+    border-radius: 0px !important;
+    min-height: 44px;
+    padding: 0.55rem 1.25rem;
+    box-shadow: none !important;
 }
 
+/* texte du bouton */
+.stButton > button,
+.stButton > button p,
+.stButton > button span,
+.stButton > button div {
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+}
+
+/* hover */
 .stButton > button:hover {
-    background-color: #FFFFFF;
-    color: #0F2D4A;
-    border: 1px solid #0F2D4A;
+    background-color: #FFFFFF !important;
+    border-color: #113653 !important;
+}
+
+.stButton > button:hover,
+.stButton > button:hover p,
+.stButton > button:hover span,
+.stButton > button:hover div {
+    color: #113653 !important;
+}
+
+/* clic */
+.stButton > button:active {
+    background-color: #0A263C !important;
+}
+
+.stButton > button:active p,
+.stButton > button:active span {
+    color: #FFFFFF !important;
 }
 
 
-/* =========================================================
+/* =========================
    INPUTS
-   ========================================================= */
+   ========================= */
 
 [data-baseweb="select"] > div,
 [data-testid="stDateInput"] input,
 textarea,
 input {
-    background: #FFFFFF !important;
-    border: 1px solid #C9CDD1 !important;
+    background-color: #FFFFFF !important;
+    color: #202428 !important;
+    border: 1px solid #C8CDD1 !important;
     border-radius: 0px !important;
     box-shadow: none !important;
 }
 
-[data-baseweb="select"] > div:focus-within,
-[data-testid="stDateInput"] input:focus,
-textarea:focus,
-input:focus {
-    border-color: #0F2D4A !important;
-}
 
-
-/* =========================================================
-   UPLOAD
-   ========================================================= */
+/* =========================
+   FILE UPLOAD
+   ========================= */
 
 [data-testid="stFileUploaderDropzone"] {
-    background: #F7F8F9;
-    border: 1px solid #D8DADD;
-    border-radius: 0px;
-    padding: 1.2rem;
+    background-color: #F5F6F7 !important;
+    border: 1px solid #D6D9DC !important;
+    border-radius: 0px !important;
 }
 
 [data-testid="stFileUploaderDropzone"] button {
-    border-radius: 0px;
+    background-color: #FFFFFF !important;
+    border: 1px solid #113653 !important;
+}
+
+[data-testid="stFileUploaderDropzone"] button,
+[data-testid="stFileUploaderDropzone"] button span,
+[data-testid="stFileUploaderDropzone"] button p {
+    color: #113653 !important;
 }
 
 
-/* =========================================================
-   TABLEAUX
-   ========================================================= */
+/* =========================
+   TABLEAU
+   ========================= */
 
 [data-testid="stDataFrame"] {
-    border-top: 2px solid #0F2D4A;
-    border-bottom: 1px solid #D8DADD;
-    background: #FFFFFF;
+    border-top: 3px solid #113653;
+    border-bottom: 1px solid #D7DADD;
 }
 
 [data-testid="stDataFrame"] * {
-    font-size: 0.92rem;
+    font-size: 0.93rem;
 }
 
 
-/* =========================================================
+/* =========================
    METRICS
-   ========================================================= */
+   ========================= */
 
 [data-testid="stMetric"] {
-    background: #FFFFFF;
-    padding: 0;
+    background-color: #FFFFFF;
     border: none;
+    padding: 0;
 }
 
 [data-testid="stMetricLabel"] {
-    color: #72777C;
-    font-size: 0.8rem;
+    color: #73787D !important;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
+    font-size: 0.78rem !important;
 }
 
 [data-testid="stMetricValue"] {
-    color: #0F2D4A;
-    font-size: 1.5rem;
-    font-weight: 500;
+    color: #113653 !important;
 }
 
 
-/* =========================================================
+/* =========================
    EXPANDERS
-   ========================================================= */
+   ========================= */
 
 [data-testid="stExpander"] {
-    background: #FFFFFF;
-    border: none;
-    border-top: 1px solid #D8DADD;
-    border-bottom: 1px solid #D8DADD;
-    border-radius: 0px;
+    border-radius: 0px !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: 1px solid #D8DBDE !important;
+    border-bottom: 1px solid #D8DBDE !important;
 }
 
 
-/* =========================================================
+/* =========================
+   SEPARATEURS
+   ========================= */
+
+hr {
+    border: 0;
+    border-top: 1px solid #DADDE0;
+    margin: 2.5rem 0;
+}
+
+
+/* =========================
    ALERTES
-   ========================================================= */
+   ========================= */
 
 [data-testid="stAlert"] {
-    border-radius: 0px;
-    border-left-width: 3px;
+    border-radius: 0px !important;
 }
 
 
-/* =========================================================
-   TEXT AREA
-   ========================================================= */
-
-textarea {
-    min-height: 180px !important;
-    font-size: 0.95rem !important;
-    line-height: 1.6 !important;
-}
-
-
-/* =========================================================
+/* =========================
    HEADER STREAMLIT
-   ========================================================= */
+   ========================= */
 
 [data-testid="stHeader"] {
-    background: rgba(255, 255, 255, 0.96);
-    border-bottom: 1px solid #ECEDEF;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #ECEEEF;
 }
 
 </style>
