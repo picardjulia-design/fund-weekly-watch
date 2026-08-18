@@ -1092,7 +1092,7 @@ if editor_key in st.session_state:
 
 st.rerun()
 
-    if unreadable:
+if unreadable:
         st.warning(
             f"{len(unreadable)} source(s) n'ont pas pu être lues."
         )
