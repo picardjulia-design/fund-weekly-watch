@@ -1095,21 +1095,21 @@ Contraintes impératives :
             f"{len(unreadable)} source(s) n'ont pas pu être lues."
         )
 
-            st.write("")
+st.write("")
 
-            with st.expander("Sources utilisées"):
-                for _, article in company_news.iterrows():
-                    title = html_lib.escape(str(article["title"]))
-                    url = html_lib.escape(str(article["url"]))
-                    render_html(
-                        f"""
-                        <div class="source-item">
-                            <div class="source-badge">Source</div>
-                            <div class="source-title">{title}</div>
-                            <div class="source-url">{url}</div>
-                        </div>
-                        """
-                    )
+with st.expander("Sources utilisées"):
+    for _, article in company_news.iterrows():
+        title = html_lib.escape(str(article["title"]))
+        url = html_lib.escape(str(article["url"]))
+        render_html(
+            f"""
+            <div class="source-item">
+                <div class="source-badge">Source</div>
+                <div class="source-title">{title}</div>
+                <div class="source-url">{url}</div>
+            </div>
+            """
+        )
 
 
 # ============================================================
