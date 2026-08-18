@@ -946,9 +946,18 @@ with tab_analysis:
 
             comment_key = f"comment_{selected_ticker}"
             editor_key = f"editor_{selected_ticker}"
+            pending_key = f"pending_comment_{selected_ticker}"
 
             if comment_key not in st.session_state:
                 st.session_state[comment_key] = ""
+
+            # A newly generated comment is transferred to the editor BEFORE
+            # the text_area widget is created. This avoids Streamlit's rule
+            # against changing a widget's session-state value after creation.
+            if pending_key in st.session_state:
+                st.session_state[editor_key] = st.session_state.pop(pending_key)
+            elif editor_key not in st.session_state:
+                st.session_state[editor_key] = st.session_state[comment_key]
 
             render_html(
                 f"""
@@ -963,7 +972,6 @@ with tab_analysis:
 
             edited_comment = st.text_area(
                 "Commentaire",
-                value=st.session_state[comment_key],
                 height=230,
                 key=editor_key,
                 label_visibility="collapsed",
@@ -1076,12 +1084,9 @@ Contraintes impératives :
                         with st.spinner(f"Analyse de {company_name}..."):
                             comment = call_mistral(prompt, MISTRAL_API_KEY)
 
-                        st.session_state[comment_key] = clean_comment(comment)
-
-                        # Reset the editor widget so it reloads the new generated value.
-                        if editor_key in st.session_state:
-                            del st.session_state[editor_key]
-
+                        cleaned_comment = clean_comment(comment)
+                        st.session_state[comment_key] = cleaned_comment
+                        st.session_state[pending_key] = cleaned_comment
                         st.rerun()
 
                 if unreadable:
