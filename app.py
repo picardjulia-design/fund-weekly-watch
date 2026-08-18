@@ -956,26 +956,23 @@ edited_comment = st.text_area(
 )
 button1, button2 = st.columns(2)
 
-            with button1:
-                generate = st.button(
-                    "Générer le commentaire"
-                    if not st.session_state[comment_key]
-                    else "Régénérer cette valeur",
-                    key=f"generate_{selected_ticker}",
-                )
+with button1:
+    generate = st.button(
+        "Générer le commentaire"
+        if not st.session_state[comment_key]
+        else "Régénérer cette valeur",
+        key=f"generate_{selected_ticker}",
+    )
 
-            with button2:
-                if st.button(
-                    "Sauvegarder les modifications",
-                    key=f"save_{selected_ticker}",
-                ):
-                    cleaned_comment = clean_comment(comment)
-
-st.session_state[comment_key] = cleaned_comment
-
-
-st.rerun()
-                    st.success("Commentaire sauvegardé.")
+with button2:
+    if st.button(
+        "Sauvegarder les modifications",
+        key=f"save_{selected_ticker}",
+    ):
+        st.session_state[comment_key] = clean_comment(
+            st.session_state[editor_key]
+        )
+        st.success("Modifications sauvegardées.")
 
             if generate:
                 article_contents = []
