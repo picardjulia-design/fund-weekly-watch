@@ -68,9 +68,11 @@ if st.button("Récupérer les cours"):
     for _, row in config.iterrows():
         yf_ticker = row["yfinance_ticker"]
 
+        # On récupère quelques jours avant pour avoir
+        # la clôture précédente du lundi
         data = yf.download(
             yf_ticker,
-            start=monday,
+            start=monday - timedelta(days=7),
             end=friday + timedelta(days=3),
             progress=False,
             auto_adjust=False
@@ -84,20 +86,25 @@ if st.button("Récupérer les cours"):
         if hasattr(closes, "columns"):
             closes = closes.iloc[:, 0]
 
-        closes = closes[
+        # On garde toutes les clôtures jusqu'au vendredi
+        closes = closes[closes.index.date <= friday]
+
+        # Séances de la semaine analysée
+        week_closes = closes[
             (closes.index.date >= monday) &
             (closes.index.date <= friday)
         ]
 
-        if closes.empty:
+        if week_closes.empty:
             continue
 
-        previous_close = None
+        for dt, close in week_closes.items():
+            position = closes.index.get_loc(dt)
 
-        for dt, close in closes.items():
             daily_change = None
 
-            if previous_close is not None:
+            if position > 0:
+                previous_close = closes.iloc[position - 1]
                 daily_change = (close / previous_close - 1) * 100
 
             price_rows.append({
@@ -112,7 +119,26 @@ if st.button("Récupérer les cours"):
                 )
             })
 
-            previous_close = close
+        # Performance totale de la semaine :
+        # dernière clôture / clôture précédente au lundi
+        first_date = week_closes.index[0]
+        first_position = closes.index.get_loc(first_date)
+
+        weekly_perf = None
+
+        if first_position > 0:
+            previous_week_close = closes.iloc[first_position - 1]
+            last_close = week_closes.iloc[-1]
+            weekly_perf = (last_close / previous_week_close - 1) * 100
+
+        if weekly_perf is not None:
+            price_rows.append({
+                "name": row["name"],
+                "ticker": row["ticker"],
+                "date": "Performance semaine",
+                "close": None,
+                "daily_change_%": round(float(weekly_perf), 2)
+            })
 
     prices_df = pd.DataFrame(price_rows)
 
