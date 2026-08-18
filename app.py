@@ -32,21 +32,21 @@ def extract_article_text(url):
         for tag in soup(["script", "style", "nav", "footer", "header", "aside"]):
             tag.decompose()
 
-  paragraphs = soup.find_all("p")
+        paragraphs = soup.find_all("p")
 
-text = "\n".join(
-    p.get_text(" ", strip=True)
-    for p in paragraphs
-    if len(p.get_text(" ", strip=True)) > 40
-)
+        text = "\n".join(
+            p.get_text(" ", strip=True)
+            for p in paragraphs
+            if len(p.get_text(" ", strip=True)) > 40
+        )
 
-# Fallback : si les paragraphes sont trop pauvres,
-# on récupère le texte général de la page
-if len(text) < 300:
-    text = soup.get_text(" ", strip=True)
+        # Si les paragraphes ne donnent pas assez de contenu,
+        # on essaie le texte général de la page
+        if len(text) < 300:
+            text = soup.get_text(" ", strip=True)
 
-if len(text) < 300:
-    return None
+        if len(text) < 300:
+            return None
 
         return text[:12000]
 
