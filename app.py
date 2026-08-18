@@ -974,52 +974,67 @@ with button2:
         )
         st.success("Modifications sauvegardées.")
 
-            if generate:
-                article_contents = []
-                unreadable = []
+if generate:
+    article_contents = []
+    unreadable = []
 
-                for _, article in company_news.iterrows():
-                    text = extract_article_text(article["url"])
+    for _, article in company_news.iterrows():
+        text = extract_article_text(article["url"])
 
-                    if text:
-                        article_contents.append(
-                            f"TITRE : {article['title']}\n\nCONTENU :\n{text}"
-                        )
-                    else:
-                        unreadable.append(article["title"])
+        if text:
+            article_contents.append(
+                f"TITRE : {article['title']}\n\nCONTENU :\n{text}"
+            )
+        else:
+            unreadable.append(article["title"])
 
-                if not article_contents:
-                    st.error("Aucune des sources de cette valeur n'a pu être lue.")
-                else:
-                    result = get_stock_data_cached(yf_ticker, monday, friday)
+    if not article_contents:
+        st.error("Aucune des sources de cette valeur n'a pu être lue.")
 
-                    if result is None:
-                        st.error("Impossible de récupérer les cours.")
-                    else:
-                        closes, week_closes = result
-                        price_text = []
+    else:
+        result = get_stock_data_cached(
+            yf_ticker,
+            monday,
+            friday
+        )
 
-                        for dt, close in week_closes.items():
-                            pos = closes.index.get_loc(dt)
+        if result is None:
+            st.error("Impossible de récupérer les cours.")
 
-                            if pos > 0:
-                                previous = closes.iloc[pos - 1]
-                                variation = (close / previous - 1) * 100
-                                price_text.append(
-                                    f"{dt.strftime('%d/%m/%Y')} : "
-                                    f"{float(close):.2f} ({variation:+.2f} %)"
-                                )
+        else:
+            closes, week_closes = result
+            price_text = []
 
-                        first_pos = closes.index.get_loc(week_closes.index[0])
-                        if first_pos > 0:
-                            previous = closes.iloc[first_pos - 1]
-                            weekly_perf_prompt = (
-                                week_closes.iloc[-1] / previous - 1
-                            ) * 100
-                        else:
-                            weekly_perf_prompt = 0
+            for dt, close in week_closes.items():
+                pos = closes.index.get_loc(dt)
 
-                        prompt = f"""
+                if pos > 0:
+                    previous = closes.iloc[pos - 1]
+                    variation = (close / previous - 1) * 100
+
+                    price_text.append(
+                        f"{dt.strftime('%d/%m/%Y')} : "
+                        f"{float(close):.2f} "
+                        f"({variation:+.2f} %)"
+                    )
+
+            first_pos = closes.index.get_loc(
+                week_closes.index[0]
+            )
+
+            if first_pos > 0:
+                previous = closes.iloc[first_pos - 1]
+
+                weekly_perf_prompt = (
+                    week_closes.iloc[-1]
+                    / previous
+                    - 1
+                ) * 100
+
+            else:
+                weekly_perf_prompt = 0
+
+            prompt = f"""
 Tu es analyste au sein d'une société de gestion d'actifs.
 
 Tu dois rédiger le commentaire hebdomadaire d'une valeur détenue dans un fonds thématique.
@@ -1060,21 +1075,25 @@ Contraintes impératives :
 - Retourne uniquement le paragraphe final en texte brut.
 """
 
-                        with st.spinner(f"Analyse de {company_name}..."):
-                            comment = call_mistral(prompt, MISTRAL_API_KEY)
+            with st.spinner(
+                f"Analyse de {company_name}..."
+            ):
+                comment = call_mistral(
+                    prompt,
+                    MISTRAL_API_KEY
+                )
 
-                        st.session_state[comment_key] = clean_comment(comment)
+            cleaned_comment = clean_comment(comment)
 
-                        # Reset the editor widget so it reloads the new generated value.
-                        if editor_key in st.session_state:
-                            del st.session_state[editor_key]
+            st.session_state[comment_key] = cleaned_comment
+            st.session_state[editor_key] = cleaned_comment
 
-                        st.rerun()
+            st.rerun()
 
-                if unreadable:
-                    st.warning(
-                        f"{len(unreadable)} source(s) n'ont pas pu être lues."
-                    )
+    if unreadable:
+        st.warning(
+            f"{len(unreadable)} source(s) n'ont pas pu être lues."
+        )
 
             st.write("")
 
