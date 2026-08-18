@@ -929,11 +929,10 @@ with tab_analysis:
                 st.metric("Performance semaine", perf_display)
 
             comment_key = f"comment_{selected_ticker}"
-editor_key = f"editor_{selected_ticker}"
+            editor_key = f"editor_{selected_ticker}"
 
-if comment_key not in st.session_state:
-    st.session_state[comment_key] = ""
-
+            if comment_key not in st.session_state:
+                st.session_state[comment_key] = ""
 if editor_key not in st.session_state:
     st.session_state[editor_key] = st.session_state[comment_key]
 
