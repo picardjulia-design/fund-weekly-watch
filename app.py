@@ -5,6 +5,7 @@ import json
 import re
 import base64
 import html as html_lib
+import io
 
 from pathlib import Path
 from datetime import date, timedelta
@@ -512,6 +513,22 @@ def clean_comment(text):
     return text.strip()
 
 
+def read_uploaded_csv(uploaded_file):
+    raw = uploaded_file.getvalue()
+    last_error = None
+
+    for encoding in ("utf-8-sig", "utf-8", "cp1252", "latin-1"):
+        try:
+            text = raw.decode(encoding)
+            df = pd.read_csv(io.StringIO(text), sep=None, engine="python")
+            df.columns = [str(c).strip() for c in df.columns]
+            return df
+        except Exception as e:
+            last_error = e
+
+    raise ValueError(f"Impossible de décoder/lire le CSV : {last_error}")
+
+
 def extract_article_text(url):
     try:
         request = Request(
@@ -699,7 +716,7 @@ render_html(
     f"""
     <div class="cpr-top">
         <div class="cpr-logo-box">{logo_html}</div>
-        
+        <div class="internal-badge">Document de travail interne</div>
     </div>
     """
 )
@@ -713,7 +730,11 @@ render_html(
             Suivi des performances, actualités et commentaires de gestion
             des principales valeurs du portefeuille.
         </div>
-        
+        <div class="hero-meta">
+            <span>Marchés : <b>Yahoo Finance</b></span>
+            <span>Synthèse : <b>Mistral AI</b></span>
+            <span>Sources : <b>sélectionnées manuellement</b></span>
+        </div>
     </div>
     """
 )
@@ -744,30 +765,17 @@ weekly_news = None
 
 if uploaded_file is not None:
     try:
-        try:
-            weekly_news = pd.read_csv(
-                uploaded_file,
-                sep=";",
-                encoding="utf-8"
-            )
-        except UnicodeDecodeError:
-            uploaded_file.seek(0)
-            weekly_news = pd.read_csv(
-                uploaded_file,
-                sep=";",
-                encoding="cp1252"
-            )
-
+        weekly_news = read_uploaded_csv(uploaded_file)
         required = {"ticker", "title", "url"}
 
         if not required.issubset(weekly_news.columns):
-            st.error(
-                "Le fichier doit contenir les colonnes ticker, title et url."
-            )
+            st.error("Le fichier doit contenir les colonnes ticker, title et url.")
             weekly_news = None
         else:
-            weekly_news = weekly_news.dropna(subset=["ticker", "url"])
-
+            weekly_news = weekly_news.dropna(subset=["ticker", "url"]).copy()
+            weekly_news["ticker"] = weekly_news["ticker"].astype(str).str.strip()
+            weekly_news["title"] = weekly_news["title"].fillna("").astype(str)
+            weekly_news["url"] = weekly_news["url"].astype(str).str.strip()
     except Exception as e:
         st.error(f"Impossible de lire le CSV : {e}")
         weekly_news = None
@@ -850,18 +858,26 @@ with tab_overview:
         prices_df = st.session_state["prices_df"]
 
         if not prices_df.empty:
-            perf_df = prices_df.dropna(subset=["Semaine"])
+            perf_df = prices_df.copy()
+            perf_df["Semaine_num"] = pd.to_numeric(
+                perf_df["Semaine"]
+                .astype(str)
+                .str.replace("%", "", regex=False)
+                .str.replace(",", ".", regex=False),
+                errors="coerce",
+            )
+            perf_df = perf_df.dropna(subset=["Semaine_num"])
 
             if not perf_df.empty:
-                best = perf_df.loc[perf_df["Semaine"].idxmax()]
-                worst = perf_df.loc[perf_df["Semaine"].idxmin()]
-                average = perf_df["Semaine"].mean()
+                best = perf_df.loc[perf_df["Semaine_num"].idxmax()]
+                worst = perf_df.loc[perf_df["Semaine_num"].idxmin()]
+                average = float(perf_df["Semaine_num"].mean())
 
                 k1, k2, k3 = st.columns(3)
                 with k1:
                     st.metric(
                         "Meilleure performance",
-                        f"{best['Semaine']:+.2f}%",
+                        f"{best['Semaine_num']:+.2f}%",
                         best["Valeur"],
                     )
                 with k2:
@@ -869,14 +885,14 @@ with tab_overview:
                 with k3:
                     st.metric(
                         "Plus faible performance",
-                        f"{worst['Semaine']:+.2f}%",
+                        f"{worst['Semaine_num']:+.2f}%",
                         worst["Valeur"],
                     )
 
             st.write("")
             st.dataframe(
                 style_price_table(prices_df),
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
                 height=520,
             )
@@ -933,107 +949,90 @@ with tab_analysis:
 
             if comment_key not in st.session_state:
                 st.session_state[comment_key] = ""
-if editor_key not in st.session_state:
-    st.session_state[editor_key] = st.session_state[comment_key]
 
-render_html(
-    f"""
-    <div class="comment-shell">
-        <div class="comment-head">
-            <div class="small">Note hebdomadaire</div>
-            <div class="name">{html_lib.escape(str(company_name))}</div>
-        </div>
-    </div>
-    """
-)
-
-edited_comment = st.text_area(
-    "Commentaire",
-    key=editor_key,
-    height=230,
-    label_visibility="collapsed",
-)
-button1, button2 = st.columns(2)
-
-with button1:
-    generate = st.button(
-        "Générer le commentaire"
-        if not st.session_state[comment_key]
-        else "Régénérer cette valeur",
-        key=f"generate_{selected_ticker}",
-    )
-
-with button2:
-    if st.button(
-        "Sauvegarder les modifications",
-        key=f"save_{selected_ticker}",
-    ):
-        st.session_state[comment_key] = clean_comment(
-            st.session_state[editor_key]
-        )
-        st.success("Modifications sauvegardées.")
-
-if generate:
-    article_contents = []
-    unreadable = []
-
-    for _, article in company_news.iterrows():
-        text = extract_article_text(article["url"])
-
-        if text:
-            article_contents.append(
-                f"TITRE : {article['title']}\n\nCONTENU :\n{text}"
-            )
-        else:
-            unreadable.append(article["title"])
-
-    if not article_contents:
-        st.error("Aucune des sources de cette valeur n'a pu être lue.")
-
-    else:
-        result = get_stock_data_cached(
-            yf_ticker,
-            monday,
-            friday
-        )
-
-        if result is None:
-            st.error("Impossible de récupérer les cours.")
-
-        else:
-            closes, week_closes = result
-            price_text = []
-
-            for dt, close in week_closes.items():
-                pos = closes.index.get_loc(dt)
-
-                if pos > 0:
-                    previous = closes.iloc[pos - 1]
-                    variation = (close / previous - 1) * 100
-
-                    price_text.append(
-                        f"{dt.strftime('%d/%m/%Y')} : "
-                        f"{float(close):.2f} "
-                        f"({variation:+.2f} %)"
-                    )
-
-            first_pos = closes.index.get_loc(
-                week_closes.index[0]
+            render_html(
+                f"""
+                <div class="comment-shell">
+                    <div class="comment-head">
+                        <div class="small">Note hebdomadaire</div>
+                        <div class="name">{html_lib.escape(str(company_name))}</div>
+                    </div>
+                </div>
+                """
             )
 
-            if first_pos > 0:
-                previous = closes.iloc[first_pos - 1]
+            edited_comment = st.text_area(
+                "Commentaire",
+                value=st.session_state[comment_key],
+                height=230,
+                key=editor_key,
+                label_visibility="collapsed",
+            )
 
-                weekly_perf_prompt = (
-                    week_closes.iloc[-1]
-                    / previous
-                    - 1
-                ) * 100
+            button1, button2 = st.columns(2)
 
-            else:
-                weekly_perf_prompt = 0
+            with button1:
+                generate = st.button(
+                    "Générer le commentaire"
+                    if not st.session_state[comment_key]
+                    else "Régénérer cette valeur",
+                    key=f"generate_{selected_ticker}",
+                )
 
-            prompt = f"""
+            with button2:
+                if st.button(
+                    "Sauvegarder les modifications",
+                    key=f"save_{selected_ticker}",
+                ):
+                    st.session_state[comment_key] = clean_comment(edited_comment)
+                    st.success("Commentaire sauvegardé.")
+
+            if generate:
+                article_contents = []
+                unreadable = []
+
+                for _, article in company_news.iterrows():
+                    text = extract_article_text(article["url"])
+
+                    if text:
+                        article_contents.append(
+                            f"TITRE : {article['title']}\n\nCONTENU :\n{text}"
+                        )
+                    else:
+                        unreadable.append(article["title"])
+
+                if not article_contents:
+                    st.error("Aucune des sources de cette valeur n'a pu être lue.")
+                else:
+                    result = get_stock_data_cached(yf_ticker, monday, friday)
+
+                    if result is None:
+                        st.error("Impossible de récupérer les cours.")
+                    else:
+                        closes, week_closes = result
+                        price_text = []
+
+                        for dt, close in week_closes.items():
+                            pos = closes.index.get_loc(dt)
+
+                            if pos > 0:
+                                previous = closes.iloc[pos - 1]
+                                variation = (close / previous - 1) * 100
+                                price_text.append(
+                                    f"{dt.strftime('%d/%m/%Y')} : "
+                                    f"{float(close):.2f} ({variation:+.2f} %)"
+                                )
+
+                        first_pos = closes.index.get_loc(week_closes.index[0])
+                        if first_pos > 0:
+                            previous = closes.iloc[first_pos - 1]
+                            weekly_perf_prompt = (
+                                week_closes.iloc[-1] / previous - 1
+                            ) * 100
+                        else:
+                            weekly_perf_prompt = 0
+
+                        prompt = f"""
 Tu es analyste au sein d'une société de gestion d'actifs.
 
 Tu dois rédiger le commentaire hebdomadaire d'une valeur détenue dans un fonds thématique.
@@ -1074,43 +1073,37 @@ Contraintes impératives :
 - Retourne uniquement le paragraphe final en texte brut.
 """
 
-            with st.spinner(
-                f"Analyse de {company_name}..."
-            ):
-                comment = call_mistral(
-                    prompt,
-                    MISTRAL_API_KEY
-                )
+                        with st.spinner(f"Analyse de {company_name}..."):
+                            comment = call_mistral(prompt, MISTRAL_API_KEY)
 
-cleaned_comment = clean_comment(comment)
+                        st.session_state[comment_key] = clean_comment(comment)
 
-st.session_state[comment_key] = cleaned_comment
+                        # Reset the editor widget so it reloads the new generated value.
+                        if editor_key in st.session_state:
+                            del st.session_state[editor_key]
 
-if editor_key in st.session_state:
-    del st.session_state[editor_key]
+                        st.rerun()
 
-st.rerun()
+                if unreadable:
+                    st.warning(
+                        f"{len(unreadable)} source(s) n'ont pas pu être lues."
+                    )
 
-if unreadable:
-        st.warning(
-            f"{len(unreadable)} source(s) n'ont pas pu être lues."
-        )
+            st.write("")
 
-st.write("")
-
-with st.expander("Sources utilisées"):
-    for _, article in company_news.iterrows():
-        title = html_lib.escape(str(article["title"]))
-        url = html_lib.escape(str(article["url"]))
-        render_html(
-            f"""
-            <div class="source-item">
-                <div class="source-badge">Source</div>
-                <div class="source-title">{title}</div>
-                <div class="source-url">{url}</div>
-            </div>
-            """
-        )
+            with st.expander("Sources utilisées"):
+                for _, article in company_news.iterrows():
+                    title = html_lib.escape(str(article["title"]))
+                    url = html_lib.escape(str(article["url"]))
+                    render_html(
+                        f"""
+                        <div class="source-item">
+                            <div class="source-badge">Source</div>
+                            <div class="source-title">{title}</div>
+                            <div class="source-url">{url}</div>
+                        </div>
+                        """
+                    )
 
 
 # ============================================================
@@ -1137,7 +1130,7 @@ with tab_sources:
 
         st.dataframe(
             weekly_news,
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             height=520,
         )
