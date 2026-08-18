@@ -3,7 +3,8 @@ from bs4 import BeautifulSoup
 import streamlit as st
 import pandas as pd
 import yfinance as yf
-
+import json
+from urllib.error import HTTPError, URLError
 def extract_article_text(url):
     try:
         request = Request(
@@ -39,6 +40,47 @@ def extract_article_text(url):
 
     except Exception:
         return None
+
+def call_mistral(prompt, api_key):
+    url = "https://api.mistral.ai/v1/chat/completions"
+
+    payload = {
+        "model": "mistral-small-latest",
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "temperature": 0.2
+    }
+
+    data = json.dumps(payload).encode("utf-8")
+
+    request = Request(
+        url,
+        data=data,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+
+    try:
+        with urlopen(request, timeout=60) as response:
+            result = json.loads(response.read().decode("utf-8"))
+
+        return result["choices"][0]["message"]["content"]
+
+    except HTTPError as e:
+        return f"Erreur API Mistral : {e.code}"
+
+    except URLError:
+        return "Impossible de contacter Mistral."
+
+    except Exception as e:
+        return f"Erreur : {str(e)}"
 st.set_page_config(
     page_title="Fund Weekly Watch",
     page_icon="📊",
