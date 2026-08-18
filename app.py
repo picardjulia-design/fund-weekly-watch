@@ -745,18 +745,32 @@ weekly_news = None
 if uploaded_file is not None:
     try:
         try:
-    weekly_news = pd.read_csv(uploaded_file, sep=";", encoding="utf-8")
-except UnicodeDecodeError:
-    uploaded_file.seek(0)
-    weekly_news = pd.read_csv(uploaded_file, sep=";", encoding="cp1252")
+            weekly_news = pd.read_csv(
+                uploaded_file,
+                sep=";",
+                encoding="utf-8"
+            )
+        except UnicodeDecodeError:
+            uploaded_file.seek(0)
+            weekly_news = pd.read_csv(
+                uploaded_file,
+                sep=";",
+                encoding="cp1252"
+            )
+
         required = {"ticker", "title", "url"}
 
         if not required.issubset(weekly_news.columns):
-            st.error("Le fichier doit contenir les colonnes ticker, title et url.")
+            st.error(
+                "Le fichier doit contenir les colonnes ticker, title et url."
+            )
+            weekly_news = None
         else:
             weekly_news = weekly_news.dropna(subset=["ticker", "url"])
+
     except Exception as e:
         st.error(f"Impossible de lire le CSV : {e}")
+        weekly_news = None
 
 
 source_count = len(weekly_news) if weekly_news is not None else 0
