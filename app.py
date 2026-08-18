@@ -27,130 +27,21 @@ st.set_page_config(page_title="Veille hebdomadaire — CPR AM",
 # STYLE — direction editoriale, pas de composants Streamlit par defaut
 # ==========================================================================
 
-st.markdown("""
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
+st.markdown(
+    "<style>"
+    "@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@400;500;600&display=swap');"
+    ':root { --nuit: #0E2745; --nuit-clair: #1C3E64; --accent: #A67C3D; --hausse: #0F6B4F; --baisse: #A3312A; --papier: #FBFAF7; --trait: #DDDAD1; --texte: #23262B; --gris: #7A7A72; } html, body, [class*="css"]  { font-family: \'Inter\', sans-serif; } .stApp { background: var(--papier); } .block-container { max-width: 1180px; padding-top: 0 !important; padding-bottom: 5rem; } #MainMenu, footer, header[data-testid="stHeader"] { visibility: hidden; height: 0; } .bandeau { background: var(--nuit); margin: 0 -100vw 2.6rem; padding: 1.9rem calc(100vw - 100% + 1rem) 1.7rem; display: flex; align-items: baseline; gap: 1rem; border-bottom: 3px solid var(--accent); } .bandeau .marque { font-family: \'Source Serif 4\', serif; font-size: 1.5rem; color: #fff; letter-spacing: 0.02em; } .bandeau .sous { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,.6); border-left: 1px solid rgba(255,255,255,.25); padding-left: 1rem; } h1, h2, h3 { font-family: \'Source Serif 4\', serif !important; color: var(--nuit) !important; } h1 { font-size: 2.1rem !important; font-weight: 400 !important; margin-bottom: 0.1rem !important; } h2 { font-size: 1.02rem !important; font-weight: 600 !important; text-transform: uppercase; letter-spacing: 0.08em; font-family: \'Inter\', sans-serif !important; color: var(--nuit) !important; border-bottom: 1px solid var(--trait); padding-bottom: 0.6rem; margin-top: 2.6rem !important; margin-bottom: 1.1rem !important; } .intro-desc { color: var(--gris); font-size: 0.95rem; max-width: 62ch; } .stTextArea textarea, .stTextInput input, .stSelectbox [data-baseweb="select"] > div, .stDateInput input, .stMultiSelect [data-baseweb="select"] > div { border-radius: 2px !important; border-color: var(--trait) !important; font-family: \'Inter\', sans-serif !important; box-shadow: none !important; } .stTextArea textarea { font-family: \'IBM Plex Mono\', \'SFMono-Regular\', monospace !important; font-size: 0.86rem !important; } .stButton > button { background: var(--nuit); color: #fff; border: none; border-radius: 2px; padding: 0.55rem 1.4rem; font-weight: 500; font-size: 0.88rem; letter-spacing: 0.02em; } .stButton > button:hover { background: var(--nuit-clair); color: #fff; } .stButton > button:disabled { background: #C7CBD1; color: #fff; } [data-testid="stMetricValue"] { font-family: \'Source Serif 4\', serif !important; color: var(--nuit) !important; font-size: 1.7rem !important; } [data-testid="stMetricLabel"] { font-size: 0.72rem !important; text-transform: uppercase; letter-spacing: 0.07em; color: var(--gris) !important; } .fiche { background: #fff; border: 1px solid var(--trait); margin-bottom: 1rem; } .fiche-tete { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; padding: 1rem 1.3rem; border-bottom: 1px solid var(--trait); } .fiche-nom { font-weight: 600; font-size: 0.98rem; color: var(--nuit); letter-spacing: 0.01em; } .fiche-ticker { font-family: \'IBM Plex Mono\', monospace; font-size: 0.72rem; color: var(--gris); background: var(--papier); padding: 2px 7px; border: 1px solid var(--trait); } .fiche-poids { font-size: 0.78rem; color: var(--gris); margin-left: auto; } .fiche-perf { font-family: \'Source Serif 4\', serif; font-size: 1.05rem; } .hausse { color: var(--hausse); } .baisse { color: var(--baisse); } .neutre { color: var(--gris); } .sources-titre { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gris); margin: 0.9rem 0 0.35rem; border-top: 1px dotted var(--trait); padding-top: 0.7rem; } .source-lien { font-size: 0.82rem; display: block; padding: 1px 0; color: var(--nuit-clair) !important; } .avertissement { font-size: 0.82rem; color: var(--baisse); margin: 0.25rem 0; } hr { border: none; border-top: 1px solid var(--trait); margin: 2rem 0; } .pied { color: var(--gris); font-size: 0.78rem; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--trait); }'
+    "</style>",
+    unsafe_allow_html=True,
+)
 
-:root {
-  --nuit: #0E2745;
-  --nuit-clair: #1C3E64;
-  --accent: #A67C3D;
-  --hausse: #0F6B4F;
-  --baisse: #A3312A;
-  --papier: #FBFAF7;
-  --trait: #DDDAD1;
-  --texte: #23262B;
-  --gris: #7A7A72;
-}
-
-html, body, [class*="css"]  { font-family: 'Inter', sans-serif; }
-
-.stApp { background: var(--papier); }
-.block-container { max-width: 1180px; padding-top: 0 !important; padding-bottom: 5rem; }
-
-#MainMenu, footer, header[data-testid="stHeader"] { visibility: hidden; height: 0; }
-
-/* ---- Bandeau ---- */
-.bandeau {
-  background: var(--nuit);
-  margin: 0 -100vw 2.6rem;
-  padding: 1.9rem calc(100vw - 100% + 1rem) 1.7rem;
-  display: flex;
-  align-items: baseline;
-  gap: 1rem;
-  border-bottom: 3px solid var(--accent);
-}
-.bandeau .marque {
-  font-family: 'Source Serif 4', serif;
-  font-size: 1.5rem;
-  color: #fff;
-  letter-spacing: 0.02em;
-}
-.bandeau .sous {
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.6);
-  border-left: 1px solid rgba(255,255,255,.25);
-  padding-left: 1rem;
-}
-
-/* ---- Titres de section ---- */
-h1, h2, h3 { font-family: 'Source Serif 4', serif !important; color: var(--nuit) !important; }
-h1 { font-size: 2.1rem !important; font-weight: 400 !important; margin-bottom: 0.1rem !important; }
-h2 {
-  font-size: 1.02rem !important; font-weight: 600 !important;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  font-family: 'Inter', sans-serif !important; color: var(--nuit) !important;
-  border-bottom: 1px solid var(--trait); padding-bottom: 0.6rem;
-  margin-top: 2.6rem !important; margin-bottom: 1.1rem !important;
-}
-.intro-desc { color: var(--gris); font-size: 0.95rem; max-width: 62ch; }
-
-/* ---- Widgets generiques : angles droits, sobre ---- */
-.stTextArea textarea, .stTextInput input, .stSelectbox [data-baseweb="select"] > div,
-.stDateInput input, .stMultiSelect [data-baseweb="select"] > div {
-  border-radius: 2px !important;
-  border-color: var(--trait) !important;
-  font-family: 'Inter', sans-serif !important;
-  box-shadow: none !important;
-}
-.stTextArea textarea { font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace !important; font-size: 0.86rem !important; }
-
-.stButton > button {
-  background: var(--nuit); color: #fff; border: none; border-radius: 2px;
-  padding: 0.55rem 1.4rem; font-weight: 500; font-size: 0.88rem; letter-spacing: 0.02em;
-}
-.stButton > button:hover { background: var(--nuit-clair); color: #fff; }
-.stButton > button:disabled { background: #C7CBD1; color: #fff; }
-
-[data-testid="stMetricValue"] {
-  font-family: 'Source Serif 4', serif !important; color: var(--nuit) !important; font-size: 1.7rem !important;
-}
-[data-testid="stMetricLabel"] {
-  font-size: 0.72rem !important; text-transform: uppercase; letter-spacing: 0.07em; color: var(--gris) !important;
-}
-
-/* ---- Fiche valeur ---- */
-.fiche {
-  background: #fff; border: 1px solid var(--trait); margin-bottom: 1rem;
-}
-.fiche-tete {
-  display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap;
-  padding: 1rem 1.3rem; border-bottom: 1px solid var(--trait);
-}
-.fiche-nom { font-weight: 600; font-size: 0.98rem; color: var(--nuit); letter-spacing: 0.01em; }
-.fiche-ticker {
-  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--gris);
-  background: var(--papier); padding: 2px 7px; border: 1px solid var(--trait);
-}
-.fiche-poids { font-size: 0.78rem; color: var(--gris); margin-left: auto; }
-.fiche-perf { font-family: 'Source Serif 4', serif; font-size: 1.05rem; }
-
-.hausse { color: var(--hausse); } .baisse { color: var(--baisse); } .neutre { color: var(--gris); }
-
-.sources-titre {
-  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--gris); margin: 0.9rem 0 0.35rem; border-top: 1px dotted var(--trait); padding-top: 0.7rem;
-}
-.source-lien { font-size: 0.82rem; display: block; padding: 1px 0; color: var(--nuit-clair) !important; }
-
-.avertissement { font-size: 0.82rem; color: var(--baisse); margin: 0.25rem 0; }
-
-hr { border: none; border-top: 1px solid var(--trait); margin: 2rem 0; }
-
-.pied { color: var(--gris); font-size: 0.78rem; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--trait); }
-
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<div class="bandeau">
-  <span class="marque">CPR AM</span>
-  <span class="sous">Veille hebdomadaire</span>
-</div>
-""", unsafe_allow_html=True)
+st.markdown(
+    '<div class="bandeau">'
+    '<span class="marque">CPR AM</span>'
+    '<span class="sous">Veille hebdomadaire</span>'
+    '</div>',
+    unsafe_allow_html=True,
+)
 
 
 # ==========================================================================
@@ -535,16 +426,15 @@ if stockage:
         classe = "neutre" if perf is None else ("hausse" if perf > 0 else "baisse" if perf < 0 else "neutre")
         perf_txt = "–" if perf is None else f"{perf:+.2f} %"
 
-        st.markdown(f"""
-        <div class="fiche">
-          <div class="fiche-tete">
-            <span class="fiche-nom">{v['nom']}</span>
-            <span class="fiche-ticker">{v['ticker'] or '—'}</span>
-            <span class="fiche-perf {classe}">{perf_txt}</span>
-            <span class="fiche-poids">{v['poids']} % du fonds</span>
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            '<div class="fiche"><div class="fiche-tete">'
+            f'<span class="fiche-nom">{v["nom"]}</span>'
+            f'<span class="fiche-ticker">{v["ticker"] or "—"}</span>'
+            f'<span class="fiche-perf {classe}">{perf_txt}</span>'
+            f'<span class="fiche-poids">{v["poids"]} % du fonds</span>'
+            '</div></div>',
+            unsafe_allow_html=True,
+        )
 
         gauche, droite = st.columns([1, 2.6])
         with gauche:
