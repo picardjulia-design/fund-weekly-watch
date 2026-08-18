@@ -188,3 +188,26 @@ if st.button("Récupérer les cours"):
             use_container_width=True,
             hide_index=True
         )
+st.divider()
+st.subheader("Test de lecture des articles")
+
+if uploaded_file is not None:
+    test_url = st.selectbox(
+        "Choisis un article à tester",
+        weekly_news["url"].tolist()
+    )
+
+    if st.button("Lire cet article"):
+        article_text = extract_article_text(test_url)
+
+        if article_text:
+            st.success("Article lu avec succès")
+            st.text_area(
+                "Texte récupéré",
+                article_text,
+                height=300
+            )
+        else:
+            st.warning(
+                "Impossible de lire cette source automatiquement."
+            )
