@@ -18,7 +18,227 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
+st.markdown("""
+<style>
 
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.stApp {
+    background: #FFFFFF;
+}
+
+.block-container {
+    max-width: 1380px;
+    padding-top: 3rem;
+    padding-bottom: 5rem;
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+}
+
+
+/* =========================================================
+   TYPOGRAPHIE
+   ========================================================= */
+
+html, body, [class*="css"] {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+    color: #0F2D4A;
+    font-size: 3rem !important;
+    line-height: 1.08 !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.035em !important;
+    margin-bottom: 0.6rem !important;
+}
+
+h2 {
+    color: #0F2D4A;
+    font-size: 1.65rem !important;
+    line-height: 1.2 !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.015em;
+    margin-top: 2.8rem !important;
+    margin-bottom: 1.2rem !important;
+}
+
+h3 {
+    color: #0F2D4A;
+    font-size: 1.15rem !important;
+    font-weight: 600 !important;
+}
+
+p {
+    color: #34393D;
+    line-height: 1.55;
+}
+
+[data-testid="stCaptionContainer"] {
+    color: #6F757B;
+    font-size: 0.95rem;
+}
+
+
+/* =========================================================
+   SEPARATEURS
+   ========================================================= */
+
+hr {
+    border: 0;
+    border-top: 1px solid #DADDE0;
+    margin-top: 2.8rem;
+    margin-bottom: 2.8rem;
+}
+
+
+/* =========================================================
+   BOUTONS
+   ========================================================= */
+
+.stButton > button {
+    background-color: #0F2D4A;
+    color: #FFFFFF;
+    border: 1px solid #0F2D4A;
+    border-radius: 0px;
+    min-height: 42px;
+    padding: 0.55rem 1.3rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.stButton > button:hover {
+    background-color: #FFFFFF;
+    color: #0F2D4A;
+    border: 1px solid #0F2D4A;
+}
+
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+[data-baseweb="select"] > div,
+[data-testid="stDateInput"] input,
+textarea,
+input {
+    background: #FFFFFF !important;
+    border: 1px solid #C9CDD1 !important;
+    border-radius: 0px !important;
+    box-shadow: none !important;
+}
+
+[data-baseweb="select"] > div:focus-within,
+[data-testid="stDateInput"] input:focus,
+textarea:focus,
+input:focus {
+    border-color: #0F2D4A !important;
+}
+
+
+/* =========================================================
+   UPLOAD
+   ========================================================= */
+
+[data-testid="stFileUploaderDropzone"] {
+    background: #F7F8F9;
+    border: 1px solid #D8DADD;
+    border-radius: 0px;
+    padding: 1.2rem;
+}
+
+[data-testid="stFileUploaderDropzone"] button {
+    border-radius: 0px;
+}
+
+
+/* =========================================================
+   TABLEAUX
+   ========================================================= */
+
+[data-testid="stDataFrame"] {
+    border-top: 2px solid #0F2D4A;
+    border-bottom: 1px solid #D8DADD;
+    background: #FFFFFF;
+}
+
+[data-testid="stDataFrame"] * {
+    font-size: 0.92rem;
+}
+
+
+/* =========================================================
+   METRICS
+   ========================================================= */
+
+[data-testid="stMetric"] {
+    background: #FFFFFF;
+    padding: 0;
+    border: none;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #72777C;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+[data-testid="stMetricValue"] {
+    color: #0F2D4A;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   EXPANDERS
+   ========================================================= */
+
+[data-testid="stExpander"] {
+    background: #FFFFFF;
+    border: none;
+    border-top: 1px solid #D8DADD;
+    border-bottom: 1px solid #D8DADD;
+    border-radius: 0px;
+}
+
+
+/* =========================================================
+   ALERTES
+   ========================================================= */
+
+[data-testid="stAlert"] {
+    border-radius: 0px;
+    border-left-width: 3px;
+}
+
+
+/* =========================================================
+   TEXT AREA
+   ========================================================= */
+
+textarea {
+    min-height: 180px !important;
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+}
+
+
+/* =========================================================
+   HEADER STREAMLIT
+   ========================================================= */
+
+[data-testid="stHeader"] {
+    background: rgba(255, 255, 255, 0.96);
+    border-bottom: 1px solid #ECEDEF;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # ------------------------------------------------------------
 # MISTRAL KEY
