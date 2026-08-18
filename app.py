@@ -929,29 +929,31 @@ with tab_analysis:
                 st.metric("Performance semaine", perf_display)
 
             comment_key = f"comment_{selected_ticker}"
-            editor_key = f"editor_{selected_ticker}"
+editor_key = f"editor_{selected_ticker}"
 
-            if comment_key not in st.session_state:
-                st.session_state[comment_key] = ""
+if comment_key not in st.session_state:
+    st.session_state[comment_key] = ""
 
-            render_html(
-                f"""
-                <div class="comment-shell">
-                    <div class="comment-head">
-                        <div class="small">Note hebdomadaire</div>
-                        <div class="name">{html_lib.escape(str(company_name))}</div>
-                    </div>
-                </div>
-                """
-            )
+if editor_key not in st.session_state:
+    st.session_state[editor_key] = st.session_state[comment_key]
 
-            edited_comment = st.text_area(
-                "Commentaire",
-                value=st.session_state[comment_key],
-                height=230,
-                key=editor_key,
-                label_visibility="collapsed",
-            )
+render_html(
+    f"""
+    <div class="comment-shell">
+        <div class="comment-head">
+            <div class="small">Note hebdomadaire</div>
+            <div class="name">{html_lib.escape(str(company_name))}</div>
+        </div>
+    </div>
+    """
+)
+
+edited_comment = st.text_area(
+    "Commentaire",
+    key=editor_key,
+    height=230,
+    label_visibility="collapsed",
+)
 
             button1, button2 = st.columns(2)
 
@@ -968,7 +970,12 @@ with tab_analysis:
                     "Sauvegarder les modifications",
                     key=f"save_{selected_ticker}",
                 ):
-                    st.session_state[comment_key] = clean_comment(edited_comment)
+                    cleaned_comment = clean_comment(comment)
+
+st.session_state[comment_key] = cleaned_comment
+
+
+st.rerun()
                     st.success("Commentaire sauvegardé.")
 
             if generate:
