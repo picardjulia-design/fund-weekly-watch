@@ -5,6 +5,13 @@ import pandas as pd
 import yfinance as yf
 import json
 from urllib.error import HTTPError, URLError
+try:
+    MISTRAL_API_KEY = st.secrets["MISTRAL_API_KEY"]
+except Exception:
+    MISTRAL_API_KEY = st.sidebar.text_input(
+        "Clé API Mistral",
+        type="password"
+    )
 def extract_article_text(url):
     try:
         request = Request(
@@ -253,3 +260,7 @@ if uploaded_file is not None:
             st.warning(
                 "Impossible de lire cette source automatiquement."
             )
+if MISTRAL_API_KEY:
+    st.success("Clé Mistral détectée")
+else:
+    st.warning("Aucune clé Mistral détectée")
