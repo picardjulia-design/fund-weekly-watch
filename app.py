@@ -954,8 +954,7 @@ edited_comment = st.text_area(
     height=230,
     label_visibility="collapsed",
 )
-
-            button1, button2 = st.columns(2)
+button1, button2 = st.columns(2)
 
             with button1:
                 generate = st.button(
