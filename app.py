@@ -1,7 +1,44 @@
+from urllib.request import Request, urlopen
+from bs4 import BeautifulSoup
 import streamlit as st
 import pandas as pd
 import yfinance as yf
 
+def extract_article_text(url):
+    try:
+        request = Request(
+            url,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 Chrome/120 Safari/537.36"
+                )
+            }
+        )
+
+        with urlopen(request, timeout=15) as response:
+            html = response.read()
+
+        soup = BeautifulSoup(html, "html.parser")
+
+        for tag in soup(["script", "style", "nav", "footer", "header", "aside"]):
+            tag.decompose()
+
+        paragraphs = soup.find_all("p")
+
+        text = "\n".join(
+            p.get_text(" ", strip=True)
+            for p in paragraphs
+            if len(p.get_text(" ", strip=True)) > 40
+        )
+
+        if len(text) < 300:
+            return None
+
+        return text[:12000]
+
+    except Exception:
+        return None
 st.set_page_config(
     page_title="Fund Weekly Watch",
     page_icon="📊",
