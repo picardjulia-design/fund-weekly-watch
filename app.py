@@ -1083,12 +1083,14 @@ Contraintes impératives :
                     MISTRAL_API_KEY
                 )
 
-            cleaned_comment = clean_comment(comment)
+cleaned_comment = clean_comment(comment)
 
-            st.session_state[comment_key] = cleaned_comment
-            st.session_state[editor_key] = cleaned_comment
+st.session_state[comment_key] = cleaned_comment
 
-            st.rerun()
+if editor_key in st.session_state:
+    del st.session_state[editor_key]
+
+st.rerun()
 
     if unreadable:
         st.warning(
