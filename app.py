@@ -934,13 +934,11 @@ with tab_analysis:
                 f"{weekly_perf:+.2f}%" if weekly_perf is not None else "—"
             )
 
-            c1, c2, c3, c4 = st.columns(4)
+            c1, c2, c4 = st.columns(4)
             with c1:
                 st.metric("Valeur", company_name)
             with c2:
                 st.metric("Ticker", selected_ticker)
-            with c3:
-                st.metric("Poids dans le fonds", f"{weight}%")
             with c4:
                 st.metric("Performance semaine", perf_display)
 
