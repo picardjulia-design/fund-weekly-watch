@@ -759,7 +759,19 @@ monday = selected_date - timedelta(days=selected_date.weekday())
 friday = monday + timedelta(days=4)
 
 with control2:
-    uploaded_file = st.file_uploader("Sources de la semaine", type=["csv"])
+    uploaded_file = st.file_uploader(
+        "Sources de la semaine",
+        type=["csv"],
+    )
+
+    st.caption(
+        "📁 Fichier disponible sur le réseau : "
+        r"P:\CPRAM\COMMERCIAL\Distribution & CGP\01 Docs Clients Distrib\Produits\GAMME THEMATIQUE ACTIONS\AI\news"
+    )
+
+    st.caption(
+        f"Fichier à utiliser cette semaine : {monday.strftime('%Y-%m-%d')}.ia.csv"
+    )
 
 weekly_news = None
 
