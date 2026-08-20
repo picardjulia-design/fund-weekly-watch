@@ -946,7 +946,7 @@ with tab_analysis:
                 f"{weekly_perf:+.2f}%" if weekly_perf is not None else "—"
             )
 
-            c1, c2, c4 = st.columns(4)
+            c1, c2, c4 = st.columns(3)
             with c1:
                 st.metric("Valeur", company_name)
             with c2:
